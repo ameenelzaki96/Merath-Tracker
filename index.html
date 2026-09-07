@@ -324,7 +324,7 @@
   </div>
 
   <div class="card" style="margin-top:18px;">
-    <h3>Whole estate · 120,000,000 SDG</h3>
+    <h3 id="grand-title">Whole estate</h3>
     <p class="desc">How the full inheritance divides once every pound is mobilised.</p>
     <div class="alloc-grand" style="margin-top:16px;">
       <div class="stackbar" id="grand-stack"></div>
@@ -364,7 +364,7 @@
 <div id="tip"></div>
 
 <script>
-const PAYLOAD = {"salt": "69/05whYmiSu+Wx1Q0+JFQ==", "ct": "dHj4ci/SLSSksTD42vTpMfroWOgDP/0j6voR+TluWJ+vi73lKxcRkKlBuwfYzULYQ+GFg0QE6CgkotEYg+NxKCdM2YgOoc56B1xcxjbfijLf9SOdZFaawv2ksGLOEl3Nkvc5fx0ZrSITYgZqxgXmazB37eWS4h1v8BIqs7bSY2urIxQDiakFPfP8ZgE+TWVqfO763og3x34I5hGA2Er6xKxa64a+s08Pwf/8A3rnqd7Xx12u/6cgxlG3atiYYSv++goODmZe4suRWLiWCxn9b1vfiu4KjbG0iiOKJzVARb9S0245R0Doj5w5nvBETkDxsBBKdfocC6o57TPmyo9wZl+x8hM+WwIe6Z5jXPPCer6waUQtie4/XAN8FtfJ9gJc206g5YWkL93EPA/GFORUo+7UohJTY/ftGAuKsXWioJzw9ZhlyUcxoRKO49dad3BS03y3DHF4osgtobl5BfCgUYquE2h34bZcR7QkXFxTXIt+RrWgtS8qPcg3ezFvMEqyvz2uhLRtVYmDOkxeMQj4q1Ae1UtEuMOHuPdVHbJcNJDnm3jXUtHVk8MSIEjIvpiO3ixSXs5sdYi02LOYA1XArIm81msIgpgMAwob9fgnRv4P1WcEc9RS7brzGoV3GPGqhf3hw1j5DPSC131v8W3YZkn1sJSomzxr0omXv0QmDGxxNwNUsC+hnbiuzhv40vtULWbqDh9P9uuzmPhIhyv40RAX/InFqEb9Sawp7TSmDuvGpmpigAllxWvqcxK3jt85f102zNVUGnRqeBBPnZ4jLlAVM0TUnVPSnrc2xh3e4EMPrmSm802OphbGH8y8W2Netdgmp0sh3X0nGNVR/u6nEnVabbcPDwlOapiV/8F6Fu+cTipl9JtVJbNw1NefbUSr0SMBeiLKR7815U2Hz6gp91bbieEDkzDuQf1xIQfXOTtnDkAZqhu//u0TxvInMVxjiRFqxAmItXm5OsMBVCb/Y0xDJJ8o/ceiwE/AYpD776cGydQGnZWE3RN+HcQYc5tXMNvkryCKMkqMe5SAo6ulfTv/I3ZzZTYMtHJcOTxO25T0OiIFkVvqU6bM/kCqrK52lfbov5Lp5dxuYRjU7w+6BFsJFoNmkuroJ27lEdWnlYJEqYwDLE31X7PpOhhw9TBVKidOn7KzUwv1dHYp7LrQqKFM0wbszgqBiJ9ERksI+xmCombpq+0ZsjV8arkXiIYsWunz1JBXPF83", "check": "Ay5sU8gZl2bJvkAHYmLEDHidJtAC7i9vRssoIGd6pYI=", "iters": 20000};
+const PAYLOAD = {"salt": "1GojsTpzlN54g3TiqUN9fw==", "ct": "D8EXtkFy2LWoIQ3DVt6o+A+9ylZHqnyOF7/NXa1YaPCcwIQ2HYTok+bLnYQ182AnyuGaEBw5PHSILKLZgSWce7qDr4MJnrRTd1sdLRoGL42l9tEgm0+XET6hU9NJOJmsmSWktLOdB28sr8Lehsr6B8FUU7ZtXhUy3xZRW4k3U/o/cv4eSb35vWViDDGSFNF1LZPh+9KcvJz/Odx2KlI00BkBP4O5DTn2vBsRdZr6l+UxIXW/AkDyaOhCGsCjy8zht79V+w++hoWkFd1TYq969X3FQYD3YFr64NRPy4lYrHwxokg94gtbH5p9FtVXpDc5TIGEZmhyE8X3tg1j/Cf7oIb653tJZ/9z90vAHQpH/Tb7CXf3DffU3ISP7KmxMzN/ahTHeYC0EAc43H+TUe9QaKxcuvKKattDjD66JWHsvgP7/9vWAh73RLoiWPfqlSDgsRwz3PquVPS7CbMn8PdBHIU3h1Iln48/Xt77A0KNCu9d+kzXhutm7AZ4tL+YYXSb48bkynaRVcmgJuDP7ezhZZRAWE+ILPQTLlHNZ74wm0xoszOHKnGmAnpr4ZvqJGEG1EVNk9mt04IQZMpRRIpGYx3TqN6N3P3v8tmN+vmcn2W4yZ/pTKO11XqgRz68f9AAsa3NNDN/Voe2VRWIe10MK6lD/eglSq8N+AqmNRn5SMJPycQiqT4SOQRsdWGyVzDdW9mraO5n5NIU4yKaJg61U2p8vXFAuD8MbBc3CWhycizqfh2MLfm0tgf5IystAiYSTNQLNbLS/zz6JgmPmtKNjSFQibjL2mnfNcOvOI/k57HtVCPvq2YC5bzPn/rMwXo+00wn1OydxHQq4rmxdzOLvvF97maGXn4Oicfh/J3/c9rdsij2R1z6jkTmFOTh+xiAO2HEWN6l8ytjfRdwK2YUbTYZ+d0Sx/TnsuZErk/1aEHFZDTC83jmaNsdv0EfUMLn8aI/LUXgNExD7OKWYCzHYaxA6k8dUcUA1rRA/HMBE1jG1r6W6IjQlfaDu1uZHJgP3GEtPlgBYs920gUE476MvGCZXIgu2/iTrdQENBkxZZ3kqvGkiwfpDsUfbyuAPuY+VDVznQmfTA8gPVL4m/H0GawlPM7M+H649MCjRKOXc02hOMKMAjzkaDDuFkiBCQ8c7VYwf0hnjLWAO4G1jolfTaM8bgWkpz4cOc5lbkoMQHt6Z1CJg9iWCi00w/kBi2T35YjlIP00ZVywIYISoHfveGT/54+5WYBDIPVDa+WYav0cdPtpUAhOeTOgrQrUhznoYQvcv9Ejw9jVssBxLv69T89EIDXm9NJkqNomdHk60u3iUbeCoEl5tNdg9xoCuGrbIksBF4X4NSjxcB47YQcm8C2etcWuRBeNm4j/cIvrhJScHNWUdtK8P3mIjz+7vsH0apva1q4j4Ti3d92x8lFIV6k+hVZWA7fkaLl6z7Wqps31mToa+dsoMilu", "check": "H7JW4/hVBHdvL4i6YKyyipmeck2voGpgRN6cohTmhHQ=", "iters": 20000};
 
 const PERSONAS = [
   {key:"Mama",   label:"Mama",   ar:"ماما",   color:"var(--p-mama)"},
@@ -502,7 +502,11 @@ function render(data){
     `<span class="fill" style="width:${pct}%"></span><span class="rest" style="width:${100-pct}%"></span>`;
   document.getElementById("lg-mob").textContent=fmt0(collected);
   document.getElementById("lg-rem").textContent=fmt0(remaining);
-  document.getElementById("foot-date").textContent="Data as of Apr 2026";
+  document.getElementById("grand-title").textContent="Whole estate · "+fmt0(total)+" SDG";
+  const allDates=channels.flatMap(c=>c.rows.map(r=>r.date)).filter(Boolean).sort();
+  const latest=allDates[allDates.length-1];
+  const mName=new Date(latest+"T00:00:00").toLocaleDateString("en-US",{month:"short",year:"numeric"});
+  document.getElementById("foot-date").textContent="Data as of "+mName;
 
   // grand allocation
   const grand=allocate(total);
@@ -585,7 +589,7 @@ function drawConversion(channels, metric){
   }[metric];
   const vals=channels.map(META.val);
   const max=Math.max(...vals)*1.15;
-  const colors=[cssv("--p-mama"),cssv("--accent"),cssv("--p-ahmed")];
+  const colors=[cssv("--p-mama"),cssv("--accent"),cssv("--p-ahmed"),cssv("--p-yasmin")];
   const accent=cssv("--accent");
   const n=channels.length;
   const band=iw/n;
