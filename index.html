@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>مواريث · Al-Merath Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    color-scheme: light;
+    --plane:#e9ece4;
+    --surface:#fbfcf9;
+    --surface-2:#f2f4ee;
+    --ink:#15211b;
+    --ink-2:#54615a;
+    --muted:#8a948c;
+    --line:#dde2d8;
+    --line-strong:#c7cec2;
+    --accent:#157a54;
+    --accent-deep:#0d5138;
+    --gold:#a9781f;
+    --gold-soft:#f3ead2;
+    --shadow:0 1px 2px rgba(21,33,27,.06),0 8px 28px -12px rgba(21,33,27,.18);
+    /* persona hues (dataviz categorical, light steps) */
+    --p-mama:#2a78d6;
+    --p-ameen:#1baf7a;
+    --p-ahmed:#eb6834;
+    --p-yousra:#c85a86;
+    --p-yasmin:#5a49b8;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme: dark;
+      --plane:#0b0f0d;
+      --surface:#141a16;
+      --surface-2:#1c231e;
+      --ink:#eef2ee;
+      --ink-2:#9caaa0;
+      --muted:#7f8a82;
+      --line:#26302a;
+      --line-strong:#33402f;
+      --accent:#33a479;
+      --accent-deep:#2b8b66;
+      --gold:#d3a343;
+      --gold-soft:#2a2417;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);
+      --p-mama:#3987e5;
+      --p-ameen:#22b284;
+      --p-ahmed:#e0672f;
+      --p-yousra:#d97aa5;
+      --p-yasmin:#9085e9;
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --plane:#0b0f0d;
+    --surface:#141a16;
+    --surface-2:#1c231e;
+    --ink:#eef2ee;
+    --ink-2:#9caaa0;
+    --muted:#7f8a82;
+    --line:#26302a;
+    --line-strong:#33402f;
+    --accent:#33a479;
+    --accent-deep:#2b8b66;
+    --gold:#d3a343;
+    --gold-soft:#2a2417;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);
+    --p-mama:#3987e5;
+    --p-ameen:#22b284;
+    --p-ahmed:#e0672f;
+    --p-yousra:#d97aa5;
+    --p-yasmin:#9085e9;
+  }
+
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--plane);color:var(--ink);
+    font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5;}
+  .mono{font-family:"IBM Plex Mono","SF Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums;}
+  .fr{font-family:"Fraunces",Georgia,serif;}
+  h1,h2,h3{margin:0;text-wrap:balance;}
+  button{font-family:inherit;cursor:pointer;}
+
+  /* ---------- Gate ---------- */
+  #gate{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+    padding:24px;background:
+      radial-gradient(120% 120% at 50% -10%, color-mix(in srgb, var(--accent) 14%, var(--plane)) 0%, var(--plane) 55%);
+    z-index:50;}
+  .gate-card{width:100%;max-width:390px;background:var(--surface);border:1px solid var(--line);
+    border-radius:20px;box-shadow:var(--shadow);padding:38px 34px 30px;text-align:center;}
+  .seal{width:52px;height:52px;margin:0 auto 18px;border-radius:50%;
+    background:var(--gold-soft);border:1px solid color-mix(in srgb,var(--gold) 40%,transparent);
+    display:flex;align-items:center;justify-content:center;color:var(--gold);}
+  .gate-card .ar{font-size:30px;font-weight:600;letter-spacing:.02em;color:var(--ink);margin-bottom:2px;}
+  .gate-card .sub{font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:26px;}
+  .gate-card label{display:block;text-align:left;font-size:12px;color:var(--ink-2);margin-bottom:7px;font-weight:500;}
+  .pw-row{display:flex;gap:8px;}
+  #pw{flex:1;min-width:0;font-size:20px;letter-spacing:.35em;text-align:center;padding:12px 14px;
+    border:1px solid var(--line-strong);border-radius:12px;background:var(--surface-2);color:var(--ink);}
+  #pw:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent);}
+  #unlock{padding:0 20px;border:none;border-radius:12px;background:var(--accent);color:#fff;font-weight:600;font-size:15px;}
+  #unlock:hover{background:var(--accent-deep);}
+  #unlock:disabled{opacity:.6;cursor:default;}
+  .gate-err{min-height:18px;margin-top:14px;font-size:13px;color:#d03b3b;}
+  .gate-note{margin-top:20px;font-size:11.5px;color:var(--muted);line-height:1.5;}
+
+  /* ---------- App ---------- */
+  #app{max-width:1060px;margin:0 auto;padding:26px 22px 70px;}
+  header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px;
+    padding-bottom:20px;border-bottom:1px solid var(--line);margin-bottom:26px;}
+  .brand{display:flex;align-items:center;gap:14px;}
+  .brand .mark{width:44px;height:44px;border-radius:12px;background:var(--accent);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:var(--shadow);}
+  .brand .ar{font-size:26px;font-weight:600;line-height:1;}
+  .brand .en{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:4px;}
+  .theme-btn{border:1px solid var(--line-strong);background:var(--surface);color:var(--ink-2);
+    border-radius:9px;padding:8px 12px;font-size:12.5px;display:flex;align-items:center;gap:6px;}
+  .theme-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+  .section-label{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);
+    display:flex;align-items:center;gap:10px;margin:34px 0 14px;}
+  .section-label::after{content:"";flex:1;height:1px;background:var(--line);}
+
+  /* hero */
+  .hero{display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:14px;}
+  .tile{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 22px;}
+  .tile.total{background:linear-gradient(155deg,var(--accent) 0%,var(--accent-deep) 100%);border:none;color:#fff;position:relative;overflow:hidden;}
+  .tile.total::after{content:"مواريث";position:absolute;right:-6px;bottom:-22px;font-family:"Fraunces",serif;
+    font-size:96px;font-weight:900;color:rgba(255,255,255,.09);pointer-events:none;}
+  .tile .k{font-size:12px;letter-spacing:.05em;color:var(--ink-2);margin-bottom:10px;}
+  .tile.total .k{color:rgba(255,255,255,.82);}
+  .tile .v{font-size:33px;font-weight:500;line-height:1;letter-spacing:-.01em;}
+  .tile .v .cur{font-size:14px;color:var(--muted);margin-left:6px;letter-spacing:.04em;}
+  .tile.total .v .cur{color:rgba(255,255,255,.7);}
+  .tile .cap{font-size:12px;color:var(--muted);margin-top:9px;}
+  .tile.total .cap{color:rgba(255,255,255,.72);}
+
+  .progress-wrap{margin-top:22px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 22px 20px;}
+  .progress-head{display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;color:var(--ink-2);margin-bottom:10px;}
+  .bar{height:14px;border-radius:8px;background:var(--surface-2);overflow:hidden;display:flex;border:1px solid var(--line);}
+  .bar .fill{background:linear-gradient(90deg,var(--accent),var(--accent-deep));}
+  .bar .rest{background:repeating-linear-gradient(45deg,transparent,transparent 5px,color-mix(in srgb,var(--gold) 22%,transparent) 5px,color-mix(in srgb,var(--gold) 22%,transparent) 10px);}
+  .legend-inline{display:flex;gap:20px;margin-top:12px;font-size:12px;color:var(--ink-2);flex-wrap:wrap;}
+  .legend-inline .dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:7px;vertical-align:-1px;}
+
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px;}
+  .card h3{font-size:16px;font-weight:600;}
+  .card .desc{font-size:13px;color:var(--ink-2);margin-top:4px;max-width:60ch;}
+
+  /* toggle */
+  .toggle{display:inline-flex;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px;}
+  .toggle button{border:none;background:transparent;color:var(--ink-2);font-size:12.5px;font-weight:500;
+    padding:7px 13px;border-radius:8px;}
+  .toggle button.on{background:var(--surface);color:var(--accent);box-shadow:0 1px 2px rgba(0,0,0,.08);}
+
+  svg{display:block;overflow:visible;}
+  .axis-txt{fill:var(--muted);font-size:11px;font-family:"IBM Plex Mono",monospace;}
+  .grid-line{stroke:var(--line);stroke-width:1;}
+  .baseline{stroke:var(--line-strong);stroke-width:1;}
+  .bar-lab{fill:var(--ink);font-size:11.5px;font-family:"IBM Plex Mono",monospace;font-weight:500;}
+  .ch-lab{fill:var(--ink-2);font-size:12.5px;font-weight:500;}
+
+  /* tooltip */
+  #tip{position:fixed;pointer-events:none;z-index:60;background:var(--ink);color:var(--plane);
+    padding:8px 11px;border-radius:9px;font-size:12px;line-height:1.45;box-shadow:var(--shadow);
+    opacity:0;transition:opacity .1s;max-width:230px;}
+  #tip .tt{font-weight:600;margin-bottom:3px;}
+  #tip .tr{display:flex;justify-content:space-between;gap:14px;}
+  #tip .tr .mono{color:var(--plane);}
+
+  /* allocation */
+  .alloc-grand{display:grid;grid-template-columns:1fr;gap:18px;}
+  .stackbar{height:30px;border-radius:9px;overflow:hidden;display:flex;border:1px solid var(--line);}
+  .stackbar > span{position:relative;transition:filter .12s;}
+  .stackbar > span:hover{filter:brightness(1.08) saturate(1.1);}
+  .persona-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+  .persona{background:var(--surface-2);border:1px solid var(--line);border-radius:13px;padding:14px 14px 15px;
+    border-top:3px solid var(--pc);}
+  .persona .nm{font-size:13px;font-weight:600;display:flex;align-items:center;gap:7px;}
+  .persona .nm .sw{width:10px;height:10px;border-radius:3px;background:var(--pc);flex:none;}
+  .persona .amt{font-size:19px;font-weight:500;margin-top:9px;letter-spacing:-.01em;}
+  .persona .pct{font-size:11.5px;color:var(--muted);margin-top:3px;}
+  .persona .ar{font-size:11px;color:var(--muted);}
+
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  .table-scroll{overflow-x:auto;margin:0 -4px;}
+  th,td{padding:10px 10px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line);}
+  th{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:600;}
+  th:first-child,td:first-child{text-align:left;}
+  td.mono{color:var(--ink);}
+  tr.tot td{border-top:2px solid var(--line-strong);border-bottom:none;font-weight:600;background:var(--surface-2);}
+  tr.rem td{color:var(--ink-2);font-style:normal;}
+  .th-p{display:inline-flex;align-items:center;gap:6px;}
+  .th-p .sw{width:9px;height:9px;border-radius:2px;}
+  .minibar{height:8px;border-radius:4px;display:flex;overflow:hidden;min-width:120px;}
+  .minibar > i{display:block;}
+
+  .rule{background:var(--gold-soft);border:1px solid color-mix(in srgb,var(--gold) 34%,transparent);
+    border-radius:14px;padding:18px 20px;font-size:13px;color:var(--ink-2);line-height:1.6;}
+  .rule b{color:var(--ink);font-weight:600;}
+  .rule .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:14px;}
+  .rule .step{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:12px 14px;}
+  .rule .step .n{font-family:"Fraunces",serif;font-size:15px;color:var(--gold);font-weight:600;}
+  .rule .step .t{font-size:12.5px;color:var(--ink);margin-top:3px;}
+
+  details.tx{margin-top:14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden;}
+  details.tx summary{padding:13px 18px;font-size:13px;font-weight:500;cursor:pointer;color:var(--ink-2);list-style:none;display:flex;justify-content:space-between;}
+  details.tx summary::-webkit-details-marker{display:none;}
+  details.tx summary::after{content:"▾";color:var(--muted);}
+  details.tx[open] summary::after{content:"▴";}
+  details.tx .tx-body{padding:0 18px 8px;}
+
+  footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);font-size:11.5px;color:var(--muted);
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+
+  @media (max-width:760px){
+    .hero{grid-template-columns:1fr 1fr;}
+    .tile.total{grid-column:1 / -1;}
+    .persona-grid{grid-template-columns:repeat(2,1fr);}
+  }
+  @media (max-width:460px){ .hero{grid-template-columns:1fr;} .persona-grid{grid-template-columns:1fr 1fr;} }
+  @media (prefers-reduced-motion: reduce){*{transition:none!important;}}
+</style>
+</head>
+<body>
+
+<!-- ================= GATE ================= -->
+<div id="gate">
+  <div class="gate-card">
+    <div class="seal" aria-hidden="true">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="10.5" width="16" height="10" rx="2.2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.3" r="1.3"/>
+      </svg>
+    </div>
+    <div class="ar fr">مواريث</div>
+    <div class="sub">Al‑Merath Tracker</div>
+    <form id="gate-form">
+      <label for="pw">Enter passcode</label>
+      <div class="pw-row">
+        <input id="pw" type="password" inputmode="numeric" autocomplete="off" placeholder="••••" aria-label="Passcode">
+        <button id="unlock" type="submit">Open</button>
+      </div>
+      <div class="gate-err" id="gate-err" role="alert"></div>
+    </form>
+    <div class="gate-note">The figures on this page are encrypted. They are decrypted in your browser only after the correct passcode is entered — nothing is readable in the file without it.</div>
+  </div>
+</div>
+
+<!-- ================= APP ================= -->
+<main id="app" hidden>
+  <header class="top">
+    <div class="brand">
+      <div class="mark fr">م</div>
+      <div>
+        <div class="ar fr">مواريث</div>
+        <div class="en">Al‑Merath Tracker</div>
+      </div>
+    </div>
+    <button class="theme-btn" id="theme-btn" type="button"><span id="theme-ico">◐</span><span id="theme-txt">Theme</span></button>
+  </header>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="tile total">
+      <div class="k">Total estate · إجمالي التركة</div>
+      <div class="v mono" id="h-total">—<span class="cur">SDG</span></div>
+      <div class="cap" id="h-total-cap"></div>
+    </div>
+    <div class="tile">
+      <div class="k">Remaining · المتبقي</div>
+      <div class="v mono" id="h-remain">—<span class="cur">SDG</span></div>
+      <div class="cap">Still held in Sudanese pounds</div>
+    </div>
+    <div class="tile">
+      <div class="k">Mobilised · تم تحويله</div>
+      <div class="v mono" id="h-collected">—<span class="cur">SDG</span></div>
+      <div class="cap" id="h-collected-cap"></div>
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-head">
+      <span>Estate mobilised across all channels</span>
+      <span class="mono" id="prog-pct"></span>
+    </div>
+    <div class="bar" id="prog-bar" aria-hidden="true"></div>
+    <div class="legend-inline">
+      <span><span class="dot" style="background:var(--accent)"></span>Mobilised <span class="mono" id="lg-mob"></span></span>
+      <span><span class="dot" style="background:color-mix(in srgb,var(--gold) 45%,transparent)"></span>Remaining <span class="mono" id="lg-rem"></span></span>
+    </div>
+  </div>
+
+  <!-- CURRENCY CONVERSION -->
+  <div class="section-label">Currency conversion</div>
+  <div class="card">
+    <div style="display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between;align-items:flex-start;">
+      <div>
+        <h3>Conversion by channel</h3>
+        <p class="desc">Each channel converts Sudanese pounds into a foreign currency. Switch the measure to compare the pounds mobilised, the foreign amount received, and the implied exchange rate.</p>
+      </div>
+      <div class="toggle" id="cc-toggle" role="tablist">
+        <button data-m="sdg" class="on" type="button">SDG mobilised</button>
+        <button data-m="fx" type="button">Foreign received</button>
+        <button data-m="rate" type="button">Implied rate</button>
+      </div>
+    </div>
+    <div id="cc-chart" style="margin-top:18px;"></div>
+  </div>
+
+  <!-- ALLOCATION -->
+  <div class="section-label">Inheritance allocation · توزيع المواريث</div>
+
+  <div class="rule">
+    For <b>each channel</b>, the total is split the same way: <b>one‑eighth (⅛) goes to Mama first</b>. The remaining seven‑eighths is then divided into <b>three equal thirds</b> — the first to Ameen, the second to Ahmed, and the third shared equally between Yousra and Yasmin.
+    <div class="steps">
+      <div class="step"><div class="n">⅛</div><div class="t"><b>Mama</b> — 12.5% of the channel</div></div>
+      <div class="step"><div class="n">1st third</div><div class="t"><b>Ameen</b> — 29.17%</div></div>
+      <div class="step"><div class="n">2nd third</div><div class="t"><b>Ahmed</b> — 29.17%</div></div>
+      <div class="step"><div class="n">3rd third</div><div class="t"><b>Yousra &amp; Yasmin</b> — 14.58% each</div></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:18px;">
+    <h3>Whole estate · 120,000,000 SDG</h3>
+    <p class="desc">How the full inheritance divides once every pound is mobilised.</p>
+    <div class="alloc-grand" style="margin-top:16px;">
+      <div class="stackbar" id="grand-stack"></div>
+      <div class="persona-grid" id="grand-personas"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:18px;">
+    <h3>Allocation by channel</h3>
+    <p class="desc">Every row applies the same ⅛‑then‑thirds rule to that channel's total. Hover a share bar for the exact amount.</p>
+    <div class="table-scroll" style="margin-top:14px;">
+      <table id="alloc-table">
+        <thead><tr>
+          <th>Channel</th><th>Total (SDG)</th>
+          <th><span class="th-p"><span class="sw" style="background:var(--p-mama)"></span>Mama</span></th>
+          <th><span class="th-p"><span class="sw" style="background:var(--p-ameen)"></span>Ameen</span></th>
+          <th><span class="th-p"><span class="sw" style="background:var(--p-ahmed)"></span>Ahmed</span></th>
+          <th><span class="th-p"><span class="sw" style="background:var(--p-yousra)"></span>Yousra</span></th>
+          <th><span class="th-p"><span class="sw" style="background:var(--p-yasmin)"></span>Yasmin</span></th>
+          <th>Share</th>
+        </tr></thead>
+        <tbody id="alloc-body"></tbody>
+      </table>
+    </div>
+    <details class="tx" id="tx-details">
+      <summary>Underlying transactions</summary>
+      <div class="tx-body" id="tx-body"></div>
+    </details>
+  </div>
+
+  <footer>
+    <span>مواريث · Al‑Merath Tracker — figures encrypted at rest, decrypted locally.</span>
+    <span class="mono" id="foot-date"></span>
+  </footer>
+</main>
+
+<div id="tip"></div>
+
+<script>
+const PAYLOAD = {"salt": "69/05whYmiSu+Wx1Q0+JFQ==", "ct": "dHj4ci/SLSSksTD42vTpMfroWOgDP/0j6voR+TluWJ+vi73lKxcRkKlBuwfYzULYQ+GFg0QE6CgkotEYg+NxKCdM2YgOoc56B1xcxjbfijLf9SOdZFaawv2ksGLOEl3Nkvc5fx0ZrSITYgZqxgXmazB37eWS4h1v8BIqs7bSY2urIxQDiakFPfP8ZgE+TWVqfO763og3x34I5hGA2Er6xKxa64a+s08Pwf/8A3rnqd7Xx12u/6cgxlG3atiYYSv++goODmZe4suRWLiWCxn9b1vfiu4KjbG0iiOKJzVARb9S0245R0Doj5w5nvBETkDxsBBKdfocC6o57TPmyo9wZl+x8hM+WwIe6Z5jXPPCer6waUQtie4/XAN8FtfJ9gJc206g5YWkL93EPA/GFORUo+7UohJTY/ftGAuKsXWioJzw9ZhlyUcxoRKO49dad3BS03y3DHF4osgtobl5BfCgUYquE2h34bZcR7QkXFxTXIt+RrWgtS8qPcg3ezFvMEqyvz2uhLRtVYmDOkxeMQj4q1Ae1UtEuMOHuPdVHbJcNJDnm3jXUtHVk8MSIEjIvpiO3ixSXs5sdYi02LOYA1XArIm81msIgpgMAwob9fgnRv4P1WcEc9RS7brzGoV3GPGqhf3hw1j5DPSC131v8W3YZkn1sJSomzxr0omXv0QmDGxxNwNUsC+hnbiuzhv40vtULWbqDh9P9uuzmPhIhyv40RAX/InFqEb9Sawp7TSmDuvGpmpigAllxWvqcxK3jt85f102zNVUGnRqeBBPnZ4jLlAVM0TUnVPSnrc2xh3e4EMPrmSm802OphbGH8y8W2Netdgmp0sh3X0nGNVR/u6nEnVabbcPDwlOapiV/8F6Fu+cTipl9JtVJbNw1NefbUSr0SMBeiLKR7815U2Hz6gp91bbieEDkzDuQf1xIQfXOTtnDkAZqhu//u0TxvInMVxjiRFqxAmItXm5OsMBVCb/Y0xDJJ8o/ceiwE/AYpD776cGydQGnZWE3RN+HcQYc5tXMNvkryCKMkqMe5SAo6ulfTv/I3ZzZTYMtHJcOTxO25T0OiIFkVvqU6bM/kCqrK52lfbov5Lp5dxuYRjU7w+6BFsJFoNmkuroJ27lEdWnlYJEqYwDLE31X7PpOhhw9TBVKidOn7KzUwv1dHYp7LrQqKFM0wbszgqBiJ9ERksI+xmCombpq+0ZsjV8arkXiIYsWunz1JBXPF83", "check": "Ay5sU8gZl2bJvkAHYmLEDHidJtAC7i9vRssoIGd6pYI=", "iters": 20000};
+
+const PERSONAS = [
+  {key:"Mama",   label:"Mama",   ar:"ماما",   color:"var(--p-mama)"},
+  {key:"Ameen",  label:"Ameen",  ar:"أمين (أنت)", color:"var(--p-ameen)"},
+  {key:"Ahmed",  label:"Ahmed",  ar:"أحمد",   color:"var(--p-ahmed)"},
+  {key:"Yousra", label:"Yousra", ar:"يسرى",   color:"var(--p-yousra)"},
+  {key:"Yasmin", label:"Yasmin", ar:"ياسمين", color:"var(--p-yasmin)"},
+];
+const PCT = {Mama:12.5, Ameen:29.1667, Ahmed:29.1667, Yousra:14.5833, Yasmin:14.5833};
+
+const fmt0 = n => Math.round(n).toLocaleString("en-US");
+const fmt2 = n => n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtCompact = n => {
+  if(n>=1e6) return (n/1e6).toLocaleString("en-US",{maximumFractionDigits:1})+"M";
+  if(n>=1e3) return (n/1e3).toLocaleString("en-US",{maximumFractionDigits:0})+"k";
+  return fmt0(n);
+};
+function allocate(T){
+  const mama=T/8, rest=T-mama, third=rest/3;
+  return {Mama:mama, Ameen:third, Ahmed:third, Yousra:third/2, Yasmin:third/2};
+}
+
+/* ---------- decryption (self-contained SHA-256; no Web Crypto, works on any
+   local file including iOS Safari, which blocks crypto.subtle off https) ---------- */
+function b64(s){return Uint8Array.from(atob(s),c=>c.charCodeAt(0));}
+const _K=new Uint32Array([0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2]);
+function sha256(msg){
+  let h0=0x6a09e667,h1=0xbb67ae85,h2=0x3c6ef372,h3=0xa54ff53a,h4=0x510e527f,h5=0x9b05688c,h6=0x1f83d9ab,h7=0x5be0cd19;
+  const l=msg.length, bitHi=Math.floor(l/0x20000000), bitLo=(l*8)>>>0;
+  const withOne=l+1, k=(56-withOne%64+64)%64, total=withOne+k+8;
+  const m=new Uint8Array(total); m.set(msg); m[l]=0x80;
+  const dv=new DataView(m.buffer); dv.setUint32(total-8,bitHi); dv.setUint32(total-4,bitLo);
+  const w=new Uint32Array(64), rotr=(x,n)=>(x>>>n)|(x<<(32-n));
+  for(let i=0;i<total;i+=64){
+    for(let t=0;t<16;t++) w[t]=dv.getUint32(i+t*4);
+    for(let t=16;t<64;t++){
+      const s0=rotr(w[t-15],7)^rotr(w[t-15],18)^(w[t-15]>>>3);
+      const s1=rotr(w[t-2],17)^rotr(w[t-2],19)^(w[t-2]>>>10);
+      w[t]=(w[t-16]+s0+w[t-7]+s1)|0;
+    }
+    let a=h0,b=h1,c=h2,d=h3,e=h4,f=h5,g=h6,h=h7;
+    for(let t=0;t<64;t++){
+      const S1=rotr(e,6)^rotr(e,11)^rotr(e,25), ch=(e&f)^(~e&g);
+      const t1=(h+S1+ch+_K[t]+w[t])|0;
+      const S0=rotr(a,2)^rotr(a,13)^rotr(a,22), maj=(a&b)^(a&c)^(b&c);
+      const t2=(S0+maj)|0;
+      h=g;g=f;f=e;e=(d+t1)|0;d=c;c=b;b=a;a=(t1+t2)|0;
+    }
+    h0=(h0+a)|0;h1=(h1+b)|0;h2=(h2+c)|0;h3=(h3+d)|0;h4=(h4+e)|0;h5=(h5+f)|0;h6=(h6+g)|0;h7=(h7+h)|0;
+  }
+  const out=new Uint8Array(32), od=new DataView(out.buffer);
+  [h0,h1,h2,h3,h4,h5,h6,h7].forEach((v,i)=>od.setUint32(i*4,v>>>0));
+  return out;
+}
+function concat(...a){let n=0;a.forEach(x=>n+=x.length);const o=new Uint8Array(n);let p=0;for(const x of a){o.set(x,p);p+=x.length;}return o;}
+function u32be(n){const b=new Uint8Array(4);new DataView(b.buffer).setUint32(0,n>>>0);return b;}
+function decrypt(pwStr){
+  const pw=new TextEncoder().encode(pwStr);
+  const salt=b64(PAYLOAD.salt), ct=b64(PAYLOAD.ct), check=b64(PAYLOAD.check);
+  let key=sha256(concat(pw,salt));
+  for(let i=1;i<PAYLOAD.iters;i++) key=sha256(concat(key,pw));
+  const c2=sha256(concat(key,new Uint8Array([1])));
+  let ok=true; for(let i=0;i<32;i++) if(c2[i]!==check[i]) ok=false;
+  if(!ok) throw new Error("badpw");
+  const ks=new Uint8Array(ct.length);
+  for(let off=0,j=0; off<ct.length; j++){ const blk=sha256(concat(key,salt,u32be(j))); const take=Math.min(32,ct.length-off); ks.set(blk.subarray(0,take),off); off+=take; }
+  const pt=new Uint8Array(ct.length); for(let i=0;i<ct.length;i++) pt[i]=ct[i]^ks[i];
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+
+/* ---------- gate ---------- */
+const gate=document.getElementById("gate"), app=document.getElementById("app");
+const pwInput=document.getElementById("pw"), errEl=document.getElementById("gate-err");
+const unlockBtn=document.getElementById("unlock");
+document.getElementById("gate-form").addEventListener("submit",e=>{
+  e.preventDefault();
+  errEl.textContent="";
+  unlockBtn.disabled=true; unlockBtn.textContent="…";
+  // defer so the button repaints before the (brief) key derivation runs
+  setTimeout(()=>{
+    try{
+      const data=decrypt(pwInput.value.trim());
+      gate.style.display="none";
+      app.hidden=false;
+      render(data);
+    }catch(err){
+      unlockBtn.disabled=false; unlockBtn.textContent="Open";
+      errEl.textContent="Incorrect passcode. Please try again.";
+      pwInput.value="";pwInput.focus();
+    }
+  },30);
+});
+window.addEventListener("DOMContentLoaded",()=>pwInput.focus());
+
+/* ---------- theme ---------- */
+document.getElementById("theme-btn").addEventListener("click",()=>{
+  const root=document.documentElement;
+  const dark=root.getAttribute("data-theme")==="dark" ||
+    (!root.getAttribute("data-theme") && matchMedia("(prefers-color-scheme: dark)").matches);
+  root.setAttribute("data-theme",dark?"light":"dark");
+  if(window.__redraw)window.__redraw();
+});
+
+/* ---------- tooltip ---------- */
+const tip=document.getElementById("tip");
+function showTip(html,x,y){tip.innerHTML=html;tip.style.opacity="1";moveTip(x,y);}
+function moveTip(x,y){
+  const w=tip.offsetWidth, h=tip.offsetHeight;
+  let nx=x+14, ny=y+14;
+  if(nx+w>innerWidth-8)nx=x-w-14;
+  if(ny+h>innerHeight-8)ny=y-h-14;
+  tip.style.left=nx+"px";tip.style.top=ny+"px";
+}
+function hideTip(){tip.style.opacity="0";}
+
+/* ---------- render ---------- */
+function render(data){
+  const channels=data.channels.map(ch=>{
+    const sdg=ch.rows.reduce((s,r)=>s+(r.sdg||0),0);
+    const fx=ch.rows.reduce((s,r)=>s+(r.fx||0),0);
+    return {...ch, sdg, fx, rate: fx? sdg/fx : null};
+  });
+  const collected=channels.reduce((s,c)=>s+c.sdg,0);
+  const total=data.totalSDG, remaining=data.remaining;
+
+  // hero
+  document.getElementById("h-total").innerHTML=fmt0(total)+'<span class="cur">SDG</span>';
+  document.getElementById("h-total-cap").textContent="Full inheritance recorded in the Sudani ledger";
+  document.getElementById("h-remain").innerHTML=fmt0(remaining)+'<span class="cur">SDG</span>';
+  document.getElementById("h-collected").innerHTML=fmt0(collected)+'<span class="cur">SDG</span>';
+  const pct=collected/total*100;
+  document.getElementById("h-collected-cap").textContent=`Across ${channels.length} channels · ${pct.toFixed(1)}% of estate`;
+  document.getElementById("prog-pct").textContent=pct.toFixed(1)+"%";
+  document.getElementById("prog-bar").innerHTML=
+    `<span class="fill" style="width:${pct}%"></span><span class="rest" style="width:${100-pct}%"></span>`;
+  document.getElementById("lg-mob").textContent=fmt0(collected);
+  document.getElementById("lg-rem").textContent=fmt0(remaining);
+  document.getElementById("foot-date").textContent="Data as of Apr 2026";
+
+  // grand allocation
+  const grand=allocate(total);
+  document.getElementById("grand-stack").innerHTML=PERSONAS.map(p=>{
+    const v=grand[p.key];
+    return `<span data-p="${p.key}" style="width:${PCT[p.key]}%;background:${p.color}"
+      onmousemove="showTip('<div class=&quot;tt&quot;>${p.label}</div><div class=&quot;tr&quot;><span>${PCT[p.key]}%</span><span class=&quot;mono&quot;>${fmt0(v)} SDG</span></div>',event.clientX,event.clientY)"
+      onmouseleave="hideTip()"></span>`;
+  }).join("");
+  document.getElementById("grand-personas").innerHTML=PERSONAS.map(p=>{
+    const v=grand[p.key];
+    return `<div class="persona" style="--pc:${p.color}">
+      <div class="nm"><span class="sw"></span>${p.label}</div>
+      <div class="ar">${p.ar}</div>
+      <div class="amt mono">${fmtCompact(v)}</div>
+      <div class="pct">${PCT[p.key]}% · ${fmt0(v)} SDG</div>
+    </div>`;
+  }).join("");
+
+  // allocation table
+  const rows=[
+    ...channels.map(c=>({name:c.name, total:c.sdg, cls:""})),
+    {name:"Remaining (SDG)", total:remaining, cls:"rem"},
+    {name:"Whole estate", total:total, cls:"tot"},
+  ];
+  document.getElementById("alloc-body").innerHTML=rows.map(r=>{
+    const a=allocate(r.total);
+    const mini=PERSONAS.map(p=>`<i style="width:${PCT[p.key]}%;background:${p.color}"
+        onmousemove="showTip('<div class=&quot;tt&quot;>${p.label} — ${r.name.replace(/'/g,'')}</div><div class=&quot;tr&quot;><span>${PCT[p.key]}%</span><span class=&quot;mono&quot;>${fmt0(a[p.key])}</span></div>',event.clientX,event.clientY)"
+        onmouseleave="hideTip()"></i>`).join("");
+    return `<tr class="${r.cls}">
+      <td>${r.name}</td>
+      <td class="mono">${fmt0(r.total)}</td>
+      <td class="mono">${fmt0(a.Mama)}</td>
+      <td class="mono">${fmt0(a.Ameen)}</td>
+      <td class="mono">${fmt0(a.Ahmed)}</td>
+      <td class="mono">${fmt0(a.Yousra)}</td>
+      <td class="mono">${fmt0(a.Yasmin)}</td>
+      <td><div class="minibar">${mini}</div></td>
+    </tr>`;
+  }).join("");
+
+  // transactions
+  document.getElementById("tx-body").innerHTML=channels.map(c=>{
+    const rws=c.rows.map(r=>`<tr>
+        <td>${r.date}</td>
+        <td class="mono">${fmt0(r.sdg)}</td>
+        <td class="mono">${r.fx!=null?fmt2(r.fx)+" "+c.currency:"—"}</td>
+      </tr>`).join("");
+    return `<div style="margin:10px 0 4px;font-weight:600;font-size:13px;">${c.name}
+        <span style="color:var(--muted);font-weight:400;">· ${c.currency} · rate ≈ ${c.rate?fmt0(c.rate):"—"} SDG/${c.currency}</span></div>
+      <table><thead><tr><th>Date</th><th>SDG</th><th>${c.currency}</th></tr></thead><tbody>${rws}</tbody></table>`;
+  }).join("");
+
+  // chart
+  let metric="sdg";
+  const toggle=document.getElementById("cc-toggle");
+  toggle.addEventListener("click",e=>{
+    const b=e.target.closest("button"); if(!b)return;
+    [...toggle.children].forEach(x=>x.classList.toggle("on",x===b));
+    metric=b.dataset.m; drawChart();
+  });
+  window.__redraw=drawChart;
+  function drawChart(){ drawConversion(channels, metric); }
+  drawChart();
+  addEventListener("resize",drawChart);
+}
+
+/* ---------- conversion chart (SVG, hand-drawn) ---------- */
+function cssv(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+function drawConversion(channels, metric){
+  const host=document.getElementById("cc-chart");
+  const W=host.clientWidth||900, H=300;
+  const m={t:24,r:16,b:52,l:64};
+  const iw=W-m.l-m.r, ih=H-m.t-m.b;
+  const META={
+    sdg:{label:"SDG mobilised", unit:"SDG", val:c=>c.sdg, fmt:v=>fmtCompact(v), tip:v=>fmt0(v)+" SDG"},
+    fx:{label:"Foreign currency received", unit:"", val:c=>c.fx, fmt:v=>fmtCompact(v), tip:(v,c)=>fmt2(v)+" "+c.currency},
+    rate:{label:"Implied rate (SDG per unit)", unit:"", val:c=>c.rate, fmt:v=>fmt0(v), tip:(v,c)=>fmt0(v)+" SDG / "+c.currency},
+  }[metric];
+  const vals=channels.map(META.val);
+  const max=Math.max(...vals)*1.15;
+  const colors=[cssv("--p-mama"),cssv("--accent"),cssv("--p-ahmed")];
+  const accent=cssv("--accent");
+  const n=channels.length;
+  const band=iw/n;
+  const bw=Math.min(120, band*0.5);
+
+  const y=v=>m.t+ih-(v/max)*ih;
+  // ticks
+  const ticks=4; let tk="";
+  for(let i=0;i<=ticks;i++){
+    const val=max*i/ticks, yy=y(val);
+    tk+=`<line class="grid-line" x1="${m.l}" y1="${yy}" x2="${W-m.r}" y2="${yy}"/>
+      <text class="axis-txt" x="${m.l-9}" y="${yy+3.5}" text-anchor="end">${META.fmt(val)}</text>`;
+  }
+  let bars="";
+  channels.forEach((c,i)=>{
+    const v=META.val(c);
+    const cx=m.l+band*i+band/2;
+    const x=cx-bw/2;
+    const yy=y(v), h=m.t+ih-yy;
+    const col=metric==="rate"?accent:colors[i%colors.length];
+    const tipHtml=`<div class=\\'tt\\'>${c.name}</div>`+
+      `<div class=\\'tr\\'><span>${META.label}</span><span class=\\'mono\\'>${META.tip(v,c)}</span></div>`+
+      (metric!=="rate"?`<div class=\\'tr\\'><span>Rate</span><span class=\\'mono\\'>${c.rate?fmt0(c.rate):"—"} SDG/${c.currency}</span></div>`:
+        `<div class=\\'tr\\'><span>SDG</span><span class=\\'mono\\'>${fmtCompact(c.sdg)}</span></div>`);
+    bars+=`<g>
+      <rect x="${x}" y="${yy}" width="${bw}" height="${h}" rx="5" fill="${col}"
+        onmousemove="showTip('${tipHtml}',event.clientX,event.clientY)" onmouseleave="hideTip()"/>
+      <text class="bar-lab" x="${cx}" y="${yy-8}" text-anchor="middle">${META.fmt(v)}</text>
+      <text class="ch-lab" x="${cx}" y="${m.t+ih+20}" text-anchor="middle">${c.name.replace(" — ","—")}</text>
+      <text class="axis-txt" x="${cx}" y="${m.t+ih+36}" text-anchor="middle">${c.currency}</text>
+    </g>`;
+  });
+  host.innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" role="img" aria-label="${META.label} by channel">
+    ${tk}
+    <line class="baseline" x1="${m.l}" y1="${m.t+ih}" x2="${W-m.r}" y2="${m.t+ih}"/>
+    ${bars}
+  </svg>`;
+}
+</script>
+</body>
+</html>
