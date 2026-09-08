@@ -310,6 +310,21 @@
     <div id="cc-chart" style="margin-top:18px;"></div>
   </div>
 
+  <!-- SECONDARY CONVERSIONS (informational, not counted) -->
+  <div id="secondary-section" hidden>
+    <div class="section-label">Secondary conversions</div>
+    <div class="card">
+      <h3 id="secondary-title">Secondary conversions</h3>
+      <p class="desc">These convert currency that was <b>already mobilised</b> from the estate (Saudi Riyals moved into Euros via Revolut). They are shown for tracking only and are <b>not</b> added to the estate total, the mobilised figure, or the allocation.</p>
+      <div class="table-scroll" style="margin-top:14px;">
+        <table id="secondary-table">
+          <thead><tr id="secondary-head"></tr></thead>
+          <tbody id="secondary-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <!-- ALLOCATION -->
   <div class="section-label">Inheritance allocation · توزيع المواريث</div>
 
@@ -364,7 +379,7 @@
 <div id="tip"></div>
 
 <script>
-const PAYLOAD = {"salt": "1GojsTpzlN54g3TiqUN9fw==", "ct": "D8EXtkFy2LWoIQ3DVt6o+A+9ylZHqnyOF7/NXa1YaPCcwIQ2HYTok+bLnYQ182AnyuGaEBw5PHSILKLZgSWce7qDr4MJnrRTd1sdLRoGL42l9tEgm0+XET6hU9NJOJmsmSWktLOdB28sr8Lehsr6B8FUU7ZtXhUy3xZRW4k3U/o/cv4eSb35vWViDDGSFNF1LZPh+9KcvJz/Odx2KlI00BkBP4O5DTn2vBsRdZr6l+UxIXW/AkDyaOhCGsCjy8zht79V+w++hoWkFd1TYq969X3FQYD3YFr64NRPy4lYrHwxokg94gtbH5p9FtVXpDc5TIGEZmhyE8X3tg1j/Cf7oIb653tJZ/9z90vAHQpH/Tb7CXf3DffU3ISP7KmxMzN/ahTHeYC0EAc43H+TUe9QaKxcuvKKattDjD66JWHsvgP7/9vWAh73RLoiWPfqlSDgsRwz3PquVPS7CbMn8PdBHIU3h1Iln48/Xt77A0KNCu9d+kzXhutm7AZ4tL+YYXSb48bkynaRVcmgJuDP7ezhZZRAWE+ILPQTLlHNZ74wm0xoszOHKnGmAnpr4ZvqJGEG1EVNk9mt04IQZMpRRIpGYx3TqN6N3P3v8tmN+vmcn2W4yZ/pTKO11XqgRz68f9AAsa3NNDN/Voe2VRWIe10MK6lD/eglSq8N+AqmNRn5SMJPycQiqT4SOQRsdWGyVzDdW9mraO5n5NIU4yKaJg61U2p8vXFAuD8MbBc3CWhycizqfh2MLfm0tgf5IystAiYSTNQLNbLS/zz6JgmPmtKNjSFQibjL2mnfNcOvOI/k57HtVCPvq2YC5bzPn/rMwXo+00wn1OydxHQq4rmxdzOLvvF97maGXn4Oicfh/J3/c9rdsij2R1z6jkTmFOTh+xiAO2HEWN6l8ytjfRdwK2YUbTYZ+d0Sx/TnsuZErk/1aEHFZDTC83jmaNsdv0EfUMLn8aI/LUXgNExD7OKWYCzHYaxA6k8dUcUA1rRA/HMBE1jG1r6W6IjQlfaDu1uZHJgP3GEtPlgBYs920gUE476MvGCZXIgu2/iTrdQENBkxZZ3kqvGkiwfpDsUfbyuAPuY+VDVznQmfTA8gPVL4m/H0GawlPM7M+H649MCjRKOXc02hOMKMAjzkaDDuFkiBCQ8c7VYwf0hnjLWAO4G1jolfTaM8bgWkpz4cOc5lbkoMQHt6Z1CJg9iWCi00w/kBi2T35YjlIP00ZVywIYISoHfveGT/54+5WYBDIPVDa+WYav0cdPtpUAhOeTOgrQrUhznoYQvcv9Ejw9jVssBxLv69T89EIDXm9NJkqNomdHk60u3iUbeCoEl5tNdg9xoCuGrbIksBF4X4NSjxcB47YQcm8C2etcWuRBeNm4j/cIvrhJScHNWUdtK8P3mIjz+7vsH0apva1q4j4Ti3d92x8lFIV6k+hVZWA7fkaLl6z7Wqps31mToa+dsoMilu", "check": "H7JW4/hVBHdvL4i6YKyyipmeck2voGpgRN6cohTmhHQ=", "iters": 20000};
+const PAYLOAD = {"salt": "utztKTLfBBCWzQJKh3y9tA==", "ct": "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", "check": "pfmnjZSqU3en1SAH7rFo/3CWMS1VjLU3b3lfImh6Dog=", "iters": 20000};
 
 const PERSONAS = [
   {key:"Mama",   label:"Mama",   ar:"ماما",   color:"var(--p-mama)"},
@@ -551,15 +566,39 @@ function render(data){
 
   // transactions
   document.getElementById("tx-body").innerHTML=channels.map(c=>{
+    const hasAcct=c.rows.some(r=>r.account);
+    const hasStat=c.rows.some(r=>r.status && r.status!=="—");
     const rws=c.rows.map(r=>`<tr>
         <td>${r.date}</td>
         <td class="mono">${fmt0(r.sdg)}</td>
         <td class="mono">${r.fx!=null?fmt2(r.fx)+" "+c.currency:"—"}</td>
+        ${hasAcct?`<td>${r.account||"—"}</td>`:""}
+        ${hasStat?`<td>${r.status||"—"}</td>`:""}
       </tr>`).join("");
     return `<div style="margin:10px 0 4px;font-weight:600;font-size:13px;">${c.name}
         <span style="color:var(--muted);font-weight:400;">· ${c.currency} · rate ≈ ${c.rate?fmt0(c.rate):"—"} SDG/${c.currency}</span></div>
-      <table><thead><tr><th>Date</th><th>SDG</th><th>${c.currency}</th></tr></thead><tbody>${rws}</tbody></table>`;
+      <table><thead><tr><th>Date</th><th>SDG</th><th>${c.currency}</th>${hasAcct?"<th>Account</th>":""}${hasStat?"<th>Status</th>":""}</tr></thead><tbody>${rws}</tbody></table>`;
   }).join("");
+
+  // secondary conversions (informational only — never counted in totals/allocation)
+  const sec=data.secondary;
+  if(sec && sec.rows && sec.rows.length){
+    document.getElementById("secondary-section").hidden=false;
+    document.getElementById("secondary-title").textContent=sec.title;
+    const totFrom=sec.rows.reduce((s,r)=>s+(r.fromAmt||0),0);
+    const totTo=sec.rows.reduce((s,r)=>s+(r.toAmt||0),0);
+    document.getElementById("secondary-head").innerHTML=
+      `<th>Date</th><th>${sec.from}</th><th>${sec.to}</th><th>Rate</th><th>Account</th>`;
+    document.getElementById("secondary-body").innerHTML=
+      sec.rows.map(r=>`<tr>
+        <td>${r.date}</td>
+        <td class="mono">${fmt2(r.fromAmt)} ${sec.from}</td>
+        <td class="mono">${fmt2(r.toAmt)} ${sec.to}</td>
+        <td class="mono">${r.toAmt?fmt2(r.fromAmt/r.toAmt):"—"} ${sec.from}/${sec.to}</td>
+        <td>${r.account||"—"}</td>
+      </tr>`).join("")+
+      `<tr class="tot"><td>Total</td><td class="mono">${fmt2(totFrom)} ${sec.from}</td><td class="mono">${fmt2(totTo)} ${sec.to}</td><td></td><td></td></tr>`;
+  }
 
   // chart
   let metric="sdg";
