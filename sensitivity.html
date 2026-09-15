@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>مواريث · FX Sensitivity</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    color-scheme: light;
+    --plane:#e9ece4; --surface:#fbfcf9; --surface-2:#f2f4ee;
+    --ink:#15211b; --ink-2:#54615a; --muted:#8a948c; --line:#dde2d8; --line-strong:#c7cec2;
+    --accent:#157a54; --accent-deep:#0d5138; --gold:#a9781f; --gold-soft:#f3ead2;
+    --good:#0a7d33; --bad:#c0392b;
+    --shadow:0 1px 2px rgba(21,33,27,.06),0 8px 28px -12px rgba(21,33,27,.18);
+    --p-mama:#2a78d6; --p-ameen:#1baf7a; --p-ahmed:#eb6834; --p-yousra:#c85a86; --p-yasmin:#5a49b8;
+  }
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+    color-scheme: dark;
+    --plane:#0b0f0d; --surface:#141a16; --surface-2:#1c231e;
+    --ink:#eef2ee; --ink-2:#9caaa0; --muted:#7f8a82; --line:#26302a; --line-strong:#33402f;
+    --accent:#33a479; --accent-deep:#2b8b66; --gold:#d3a343; --gold-soft:#2a2417;
+    --good:#38c93a; --bad:#e8776b;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);
+    --p-mama:#3987e5; --p-ameen:#22b284; --p-ahmed:#e0672f; --p-yousra:#d97aa5; --p-yasmin:#9085e9;
+  }}
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --plane:#0b0f0d; --surface:#141a16; --surface-2:#1c231e;
+    --ink:#eef2ee; --ink-2:#9caaa0; --muted:#7f8a82; --line:#26302a; --line-strong:#33402f;
+    --accent:#33a479; --accent-deep:#2b8b66; --gold:#d3a343; --gold-soft:#2a2417;
+    --good:#38c93a; --bad:#e8776b;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);
+    --p-mama:#3987e5; --p-ameen:#22b284; --p-ahmed:#e0672f; --p-yousra:#d97aa5; --p-yasmin:#9085e9;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--plane);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;line-height:1.5;}
+  .mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums;}
+  .fr{font-family:"Fraunces",Georgia,serif;}
+  h1,h2,h3{margin:0;text-wrap:balance;} button{font-family:inherit;cursor:pointer;}
+
+  /* gate */
+  #gate{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;
+    background:radial-gradient(120% 120% at 50% -10%, color-mix(in srgb, var(--accent) 14%, var(--plane)) 0%, var(--plane) 55%);z-index:50;}
+  .gate-card{width:100%;max-width:390px;background:var(--surface);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);padding:38px 34px 30px;text-align:center;}
+  .seal{width:52px;height:52px;margin:0 auto 18px;border-radius:50%;background:var(--gold-soft);border:1px solid color-mix(in srgb,var(--gold) 40%,transparent);display:flex;align-items:center;justify-content:center;color:var(--gold);}
+  .gate-card .ar{font-size:30px;font-weight:600;color:var(--ink);margin-bottom:2px;}
+  .gate-card .sub{font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:26px;}
+  .gate-card label{display:block;text-align:left;font-size:12px;color:var(--ink-2);margin-bottom:7px;font-weight:500;}
+  .pw-row{display:flex;gap:8px;}
+  #pw{flex:1;min-width:0;font-size:20px;letter-spacing:.35em;text-align:center;padding:12px 14px;border:1px solid var(--line-strong);border-radius:12px;background:var(--surface-2);color:var(--ink);}
+  #pw:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent);}
+  #unlock{padding:0 20px;border:none;border-radius:12px;background:var(--accent);color:#fff;font-weight:600;font-size:15px;}
+  #unlock:hover{background:var(--accent-deep);} #unlock:disabled{opacity:.6;}
+  .gate-err{min-height:18px;margin-top:14px;font-size:13px;color:var(--bad);}
+  .gate-note{margin-top:20px;font-size:11.5px;color:var(--muted);line-height:1.5;}
+
+  #app{max-width:1060px;margin:0 auto;padding:26px 22px 70px;}
+  header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px;padding-bottom:20px;border-bottom:1px solid var(--line);margin-bottom:22px;}
+  .brand{display:flex;align-items:center;gap:14px;}
+  .brand .mark{width:44px;height:44px;border-radius:12px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;}
+  .brand .ar{font-size:24px;font-weight:600;line-height:1;}
+  .brand .en{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-top:4px;}
+  .top-actions{display:flex;gap:8px;}
+  .lnk,.theme-btn{border:1px solid var(--line-strong);background:var(--surface);color:var(--ink-2);border-radius:9px;padding:8px 12px;font-size:12.5px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;}
+  .lnk:hover,.theme-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+  .lead{font-size:13.5px;color:var(--ink-2);max-width:74ch;margin:0 0 20px;}
+  .lead b{color:var(--ink);}
+  .section-label{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:10px;margin:30px 0 14px;}
+  .section-label::after{content:"";flex:1;height:1px;background:var(--line);}
+
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px;}
+  .controls{display:flex;flex-wrap:wrap;gap:22px;align-items:flex-end;}
+  .rate-field label{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+  .rate-field .in{display:flex;align-items:baseline;gap:7px;}
+  .rate-field input{width:120px;font-family:"IBM Plex Mono",monospace;font-size:22px;font-weight:500;padding:8px 11px;border:1px solid var(--line-strong);border-radius:10px;background:var(--surface-2);color:var(--ink);}
+  .rate-field input:focus{outline:2px solid var(--accent);outline-offset:1px;}
+  .rate-field .unit{font-size:11.5px;color:var(--muted);}
+  .rate-field .base{font-size:11.5px;color:var(--muted);margin-top:5px;}
+  .presets{display:flex;gap:8px;margin-left:auto;align-self:flex-end;}
+  .presets button{border:1px solid var(--line-strong);background:var(--surface-2);color:var(--ink-2);border-radius:9px;padding:9px 13px;font-size:12.5px;font-weight:500;}
+  .presets button:hover{border-color:var(--accent);color:var(--accent);}
+
+  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:18px;}
+  .tile{background:var(--surface);border:1px solid var(--line);border-radius:15px;padding:17px 19px;}
+  .tile .k{font-size:11.5px;color:var(--ink-2);margin-bottom:9px;}
+  .tile .v{font-size:24px;font-weight:500;letter-spacing:-.01em;line-height:1;}
+  .tile .v .u{font-size:12px;color:var(--muted);margin-left:5px;}
+  .tile .sub{font-size:11.5px;color:var(--muted);margin-top:7px;}
+  .tile.hl{background:linear-gradient(155deg,var(--accent) 0%,var(--accent-deep) 100%);border:none;color:#fff;}
+  .tile.hl .k,.tile.hl .sub{color:rgba(255,255,255,.82);} .tile.hl .v .u{color:rgba(255,255,255,.7);}
+  .pos{color:var(--good);} .neg{color:var(--bad);}
+
+  svg{display:block;overflow:visible;}
+  .axis-txt{fill:var(--muted);font-size:11px;font-family:"IBM Plex Mono",monospace;}
+  .grid-line{stroke:var(--line);stroke-width:1;} .baseline{stroke:var(--line-strong);stroke-width:1;}
+  .bar-lab{fill:var(--ink);font-size:11px;font-family:"IBM Plex Mono",monospace;font-weight:500;}
+  .ch-lab{fill:var(--ink-2);font-size:12px;}
+
+  .table-scroll{overflow-x:auto;margin-top:6px;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th,td{padding:10px 9px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line);}
+  th:first-child,td:first-child{text-align:left;}
+  th{font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:600;}
+  tr.tot td{border-top:2px solid var(--line-strong);border-bottom:none;font-weight:700;background:var(--surface-2);}
+  .day1{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px;}
+  .day1 .b{background:var(--surface-2);border:1px solid var(--line);border-radius:13px;padding:15px 17px;}
+  .day1 .b h4{margin:0 0 8px;font-size:13px;}
+  .day1 .row{display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-2);padding:3px 0;}
+  .day1 .row .mono{color:var(--ink);}
+  .note{font-size:12px;color:var(--muted);line-height:1.6;margin-top:14px;}
+  .desc{font-size:13px;color:var(--ink-2);margin:4px 0 0;max-width:70ch;}
+  #tip{position:fixed;pointer-events:none;z-index:60;background:var(--ink);color:var(--plane);padding:8px 11px;border-radius:9px;font-size:12px;line-height:1.5;box-shadow:var(--shadow);opacity:0;transition:opacity .1s;max-width:250px;}
+  #tip .tt{font-weight:600;margin-bottom:3px;} #tip .tr{display:flex;justify-content:space-between;gap:16px;}
+  footer{margin-top:38px;padding-top:18px;border-top:1px solid var(--line);font-size:11.5px;color:var(--muted);}
+  @media (max-width:820px){.tiles{grid-template-columns:1fr 1fr;} }
+  @media (max-width:560px){.day1{grid-template-columns:1fr;} .presets{margin-left:0;} }
+  @media (prefers-reduced-motion: reduce){*{transition:none!important;}}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="gate-card">
+    <div class="seal" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10.5" width="16" height="10" rx="2.2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.3" r="1.3"/></svg></div>
+    <div class="ar fr">مواريث</div>
+    <div class="sub">FX Sensitivity</div>
+    <form id="gate-form">
+      <label for="pw">Enter passcode</label>
+      <div class="pw-row"><input id="pw" type="password" inputmode="numeric" autocomplete="off" placeholder="••••" aria-label="Passcode"><button id="unlock" type="submit">Open</button></div>
+      <div class="gate-err" id="gate-err" role="alert"></div>
+    </form>
+    <div class="gate-note">The figures are encrypted and decrypted in your browser only after the correct passcode is entered.</div>
+  </div>
+</div>
+
+<main id="app" hidden>
+  <header class="top">
+    <div class="brand"><div class="mark fr">م</div><div><div class="ar fr">تحليل الحساسية</div><div class="en">FX Sensitivity</div></div></div>
+    <div class="top-actions">
+      <a class="lnk" id="tracker-link" href="index.html">← Tracker</a>
+      <button class="theme-btn" id="theme-btn" type="button">◐ Theme</button>
+    </div>
+  </header>
+
+  <p class="lead">The estate's Sudanese pounds have been converted into euros and Saudi riyals at the rates available on each date. This page asks two things: <b>how much are those foreign holdings worth back in SDG if rates move</b>, and <b>how much foreign currency the same pounds would have bought had a single rate applied from day one</b>. Adjust the rates below — everything recalculates live.</p>
+
+  <div class="card">
+    <div class="controls">
+      <div class="rate-field">
+        <label>Euro → SDG</label>
+        <div class="in"><input id="eurRate" type="number" step="10" value="8600"><span class="unit">SDG / €</span></div>
+        <div class="base">baseline (old): 7,600</div>
+      </div>
+      <div class="rate-field">
+        <label>Riyal → SDG</label>
+        <div class="in"><input id="sarRate" type="number" step="10" value="1940"><span class="unit">SDG / ﷼</span></div>
+        <div class="base">baseline (old): 1,840</div>
+      </div>
+      <div class="presets">
+        <button type="button" data-e="7600" data-s="1840">Old · 7,600 / 1,840</button>
+        <button type="button" data-e="8600" data-s="1940">New · 8,600 / 1,940</button>
+      </div>
+    </div>
+    <div class="tiles" id="tiles"></div>
+  </div>
+
+  <div class="section-label">Impact by channel</div>
+  <div class="card">
+    <h3>FX gain on each channel at the scenario rate</h3>
+    <p class="desc">For every channel, the bar is the foreign currency it holds valued at the scenario rate, minus the SDG originally spent to acquire it. Green means the holding is now worth more in pounds than it cost.</p>
+    <div id="chart" style="margin-top:16px;"></div>
+  </div>
+
+  <div class="card" style="margin-top:16px;">
+    <div class="table-scroll">
+      <table id="tbl">
+        <thead><tr>
+          <th>Channel</th><th>Cur.</th><th>Foreign held</th><th>SDG spent</th>
+          <th>Value @ old</th><th>Value @ scenario</th><th>Gain vs spent</th><th>%</th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-label">If the scenario rate had applied from day one</div>
+  <div class="card">
+    <p class="desc">Same pounds spent, but every conversion done at the scenario rate instead of the historical rates. Because the scenario rate is higher (each unit of foreign currency costs more SDG), the same spend buys less foreign currency — which is the mirror image of the gain above.</p>
+    <div class="day1" id="day1"></div>
+  </div>
+
+  <footer>
+    <span>مواريث · FX Sensitivity — a what-if view over the same encrypted data as the tracker. Historical amounts are unchanged; only the valuation rate is varied.</span>
+  </footer>
+</main>
+<div id="tip"></div>
+
+<script>
+const EMBEDDED_PAYLOAD = {"salt": "z/a2G8LxOdw1IcxRrDHtSA==", "ct": "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", "check": "aLhy2n6zdUNCSLIoDoAyeNpor3d9uqxuypcHr/dq+7k=", "iters": 20000};
+let ACTIVE_PAYLOAD=EMBEDDED_PAYLOAD;
+function b64(s){return Uint8Array.from(atob(s),c=>c.charCodeAt(0));}
+const _K=new Uint32Array([0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2]);
+function sha256(msg){let h0=0x6a09e667,h1=0xbb67ae85,h2=0x3c6ef372,h3=0xa54ff53a,h4=0x510e527f,h5=0x9b05688c,h6=0x1f83d9ab,h7=0x5be0cd19;const l=msg.length,bitHi=Math.floor(l/0x20000000),bitLo=(l*8)>>>0,withOne=l+1,k=(56-withOne%64+64)%64,total=withOne+k+8;const m=new Uint8Array(total);m.set(msg);m[l]=0x80;const dv=new DataView(m.buffer);dv.setUint32(total-8,bitHi);dv.setUint32(total-4,bitLo);const w=new Uint32Array(64),rotr=(x,n)=>(x>>>n)|(x<<(32-n));for(let i=0;i<total;i+=64){for(let t=0;t<16;t++)w[t]=dv.getUint32(i+t*4);for(let t=16;t<64;t++){const s0=rotr(w[t-15],7)^rotr(w[t-15],18)^(w[t-15]>>>3);const s1=rotr(w[t-2],17)^rotr(w[t-2],19)^(w[t-2]>>>10);w[t]=(w[t-16]+s0+w[t-7]+s1)|0;}let a=h0,b=h1,c=h2,d=h3,e=h4,f=h5,g=h6,h=h7;for(let t=0;t<64;t++){const S1=rotr(e,6)^rotr(e,11)^rotr(e,25),ch=(e&f)^(~e&g);const t1=(h+S1+ch+_K[t]+w[t])|0;const S0=rotr(a,2)^rotr(a,13)^rotr(a,22),maj=(a&b)^(a&c)^(b&c);const t2=(S0+maj)|0;h=g;g=f;f=e;e=(d+t1)|0;d=c;c=b;b=a;a=(t1+t2)|0;}h0=(h0+a)|0;h1=(h1+b)|0;h2=(h2+c)|0;h3=(h3+d)|0;h4=(h4+e)|0;h5=(h5+f)|0;h6=(h6+g)|0;h7=(h7+h)|0;}const out=new Uint8Array(32),od=new DataView(out.buffer);[h0,h1,h2,h3,h4,h5,h6,h7].forEach((v,i)=>od.setUint32(i*4,v>>>0));return out;}
+function concat(...a){let n=0;a.forEach(x=>n+=x.length);const o=new Uint8Array(n);let p=0;for(const x of a){o.set(x,p);p+=x.length;}return o;}
+function u32be(n){const b=new Uint8Array(4);new DataView(b.buffer).setUint32(0,n>>>0);return b;}
+function decrypt(pwStr){const P=ACTIVE_PAYLOAD;const pw=new TextEncoder().encode(pwStr);const salt=b64(P.salt),ct=b64(P.ct),check=b64(P.check);let key=sha256(concat(pw,salt));for(let i=1;i<P.iters;i++)key=sha256(concat(key,pw));const c2=sha256(concat(key,new Uint8Array([1])));let ok=check.length===32;for(let i=0;i<32;i++)if(c2[i]!==check[i])ok=false;if(!ok)throw new Error("badpw");const ks=new Uint8Array(ct.length);for(let off=0,j=0;off<ct.length;j++){const blk=sha256(concat(key,salt,u32be(j)));const take=Math.min(32,ct.length-off);ks.set(blk.subarray(0,take),off);off+=take;}const pt=new Uint8Array(ct.length);for(let i=0;i<ct.length;i++)pt[i]=ct[i]^ks[i];return JSON.parse(new TextDecoder().decode(pt));}
+function loadLatest(){return fetch("data.enc",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(p=>{if(p&&p.ct&&p.salt&&p.check&&p.iters)ACTIVE_PAYLOAD=p;}).catch(()=>{});}
+const dataReady=loadLatest();
+
+/* gate */
+const gate=document.getElementById("gate"),app=document.getElementById("app"),pwInput=document.getElementById("pw"),errEl=document.getElementById("gate-err"),unlockBtn=document.getElementById("unlock");
+document.getElementById("gate-form").addEventListener("submit",e=>{e.preventDefault();errEl.textContent="";unlockBtn.disabled=true;unlockBtn.textContent="…";const pw=pwInput.value.trim();Promise.resolve(dataReady).then(()=>new Promise(r=>setTimeout(r,20))).then(()=>{try{const d=decrypt(pw);gate.style.display="none";app.hidden=false;boot(d);}catch(err){unlockBtn.disabled=false;unlockBtn.textContent="Open";errEl.textContent="Incorrect passcode. Please try again.";pwInput.value="";pwInput.focus();}});});
+window.addEventListener("DOMContentLoaded",()=>pwInput.focus());
+document.getElementById("theme-btn").addEventListener("click",()=>{const r=document.documentElement;const dark=r.getAttribute("data-theme")==="dark"||(!r.getAttribute("data-theme")&&matchMedia("(prefers-color-scheme: dark)").matches);r.setAttribute("data-theme",dark?"light":"dark");if(window.__redraw)window.__redraw();});
+
+/* tooltip */
+const tip=document.getElementById("tip");
+function showTip(html,x,y){tip.innerHTML=html;tip.style.opacity="1";const w=tip.offsetWidth,h=tip.offsetHeight;let nx=x+14,ny=y+14;if(nx+w>innerWidth-8)nx=x-w-14;if(ny+h>innerHeight-8)ny=y-h-14;tip.style.left=nx+"px";tip.style.top=ny+"px";}
+function hideTip(){tip.style.opacity="0";}
+
+/* format */
+const fmt0=n=>Math.round(n).toLocaleString("en-US");
+const fmt2=n=>n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtC=n=>{const a=Math.abs(n);if(a>=1e6)return (n/1e6).toLocaleString("en-US",{maximumFractionDigits:2})+"M";if(a>=1e3)return (n/1e3).toLocaleString("en-US",{maximumFractionDigits:0})+"k";return fmt0(n);};
+const sgn=n=>(n>=0?"+":"−")+fmt0(Math.abs(n));
+
+const EUR_OLD=7600, SAR_OLD=1840;
+let CH=[];
+function boot(data){
+  CH=data.channels.map(ch=>({
+    name:ch.name, cur:ch.currency, sym:ch.symbol,
+    F:ch.rows.reduce((a,r)=>a+(r.fx||0),0),
+    M:ch.rows.reduce((a,r)=>a+(r.fx!=null?r.sdg:0),0)
+  })).filter(c=>c.F>0);
+  const eur=document.getElementById("eurRate"), sar=document.getElementById("sarRate");
+  eur.addEventListener("input",recompute); sar.addEventListener("input",recompute);
+  document.querySelectorAll(".presets button").forEach(b=>b.addEventListener("click",()=>{eur.value=b.dataset.e;sar.value=b.dataset.s;recompute();}));
+  window.__redraw=recompute;
+  recompute();
+  addEventListener("resize",recompute);
+}
+function rates(){return {EUR:+document.getElementById("eurRate").value||0, SAR:+document.getElementById("sarRate").value||0};}
+
+function recompute(){
+  const r=rates();
+  const rO=c=>c==="EUR"?EUR_OLD:SAR_OLD;
+  const rN=c=>r[c];
+  let F={EUR:0,SAR:0},M={EUR:0,SAR:0};
+  CH.forEach(c=>{F[c.cur]+=c.F;M[c.cur]+=c.M;});
+  const spent=M.EUR+M.SAR;
+  const valOld=F.EUR*EUR_OLD+F.SAR*SAR_OLD;
+  const valNew=F.EUR*rN("EUR")+F.SAR*rN("SAR");
+  const gain=valNew-spent, move=valNew-valOld;
+
+  // tiles
+  document.getElementById("tiles").innerHTML=`
+    <div class="tile"><div class="k">Foreign currency held</div>
+      <div class="v mono">${fmt0(F.EUR)}<span class="u">€</span></div>
+      <div class="sub mono">${fmt0(F.SAR)} ﷼</div></div>
+    <div class="tile"><div class="k">SDG spent to acquire it</div>
+      <div class="v mono">${fmtC(spent)}<span class="u">SDG</span></div>
+      <div class="sub">rows with a recorded rate</div></div>
+    <div class="tile"><div class="k">Value at scenario rate</div>
+      <div class="v mono">${fmtC(valNew)}<span class="u">SDG</span></div>
+      <div class="sub">vs ${fmtC(valOld)} at old rate</div></div>
+    <div class="tile hl"><div class="k">Net FX gain vs spent</div>
+      <div class="v mono">${sgn(gain)}<span class="u">SDG</span></div>
+      <div class="sub">rate move alone: ${sgn(move)} SDG</div></div>`;
+
+  // table
+  const rows=CH.map(c=>{const vo=c.F*rO(c.cur),vn=c.F*rN(c.cur),g=vn-c.M,p=c.M?g/c.M*100:0;return {...c,vo,vn,g,p};});
+  const tb=rows.map(c=>`<tr>
+    <td>${c.name}</td><td>${c.cur}</td>
+    <td class="mono">${fmt2(c.F)} ${c.sym}</td>
+    <td class="mono">${fmt0(c.M)}</td>
+    <td class="mono">${fmt0(c.vo)}</td>
+    <td class="mono">${fmt0(c.vn)}</td>
+    <td class="mono ${c.g>=0?'pos':'neg'}">${sgn(c.g)}</td>
+    <td class="mono ${c.g>=0?'pos':'neg'}">${(c.p>=0?'+':'−')+Math.abs(c.p).toFixed(1)}%</td></tr>`).join("");
+  const tG=valNew-spent;
+  document.getElementById("tbody").innerHTML=tb+`<tr class="tot">
+    <td>Total</td><td></td>
+    <td class="mono">${fmt0(F.EUR)} € · ${fmt0(F.SAR)} ﷼</td>
+    <td class="mono">${fmt0(spent)}</td>
+    <td class="mono">${fmt0(valOld)}</td>
+    <td class="mono">${fmt0(valNew)}</td>
+    <td class="mono ${tG>=0?'pos':'neg'}">${sgn(tG)}</td>
+    <td class="mono ${tG>=0?'pos':'neg'}">${(tG>=0?'+':'−')+Math.abs(tG/spent*100).toFixed(1)}%</td></tr>`;
+
+  // from day 1
+  const d1=(cur,label,symbol)=>{const would=M[cur]/rN(cur);const diff=F[cur]-would;return `<div class="b"><h4>${label}</h4>
+    <div class="row"><span>Actually received</span><span class="mono">${fmt2(F[cur])} ${symbol}</span></div>
+    <div class="row"><span>Same SDG at scenario rate</span><span class="mono">${fmt2(would)} ${symbol}</span></div>
+    <div class="row"><span>Difference</span><span class="mono ${diff>=0?'pos':'neg'}">${(diff>=0?'+':'−')+fmt2(Math.abs(diff))} ${symbol}</span></div>
+    <div class="row"><span>SDG spent</span><span class="mono">${fmt0(M[cur])}</span></div></div>`;};
+  document.getElementById("day1").innerHTML=d1("EUR","Euro (Intesa + Revolut)","€")+d1("SAR","Riyal (Al‑Rajhi + Alinma + Cash)","﷼");
+
+  drawChart(rows);
+}
+
+function cssv(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+function drawChart(rows){
+  const host=document.getElementById("chart");
+  const W=host.clientWidth||900, H=300, m={t:26,r:16,b:54,l:74};
+  const iw=W-m.l-m.r, ih=H-m.t-m.b;
+  const vals=rows.map(r=>r.g);
+  const maxV=Math.max(0,...vals), minV=Math.min(0,...vals);
+  const span=(maxV-minV)||1;
+  const y=v=>m.t+ih-((v-minV)/span)*ih;
+  const zeroY=y(0);
+  const good=cssv("--good"), bad=cssv("--bad");
+  let ticks=""; const N=4;
+  for(let i=0;i<=N;i++){const v=minV+span*i/N,yy=y(v);ticks+=`<line class="grid-line" x1="${m.l}" y1="${yy}" x2="${W-m.r}" y2="${yy}"/><text class="axis-txt" x="${m.l-9}" y="${yy+3.5}" text-anchor="end">${fmtC(v)}</text>`;}
+  const band=iw/rows.length, bw=Math.min(96,band*0.56);
+  let bars="";
+  rows.forEach((r,i)=>{
+    const cx=m.l+band*i+band/2, x=cx-bw/2;
+    const yv=y(r.g), top=Math.min(yv,zeroY), hgt=Math.abs(yv-zeroY);
+    const col=r.g>=0?good:bad;
+    const tip=`<div class='tt'>${r.name}</div><div class='tr'><span>Foreign held</span><span class='mono'>${fmt2(r.F)} ${r.sym}</span></div><div class='tr'><span>SDG spent</span><span class='mono'>${fmt0(r.M)}</span></div><div class='tr'><span>Value @ scenario</span><span class='mono'>${fmt0(r.vn)}</span></div><div class='tr'><span>Gain</span><span class='mono'>${sgn(r.g)} SDG</span></div>`;
+    bars+=`<g><rect x="${x}" y="${top}" width="${bw}" height="${Math.max(hgt,1)}" rx="4" fill="${col}" onmousemove="showTip(\`${tip}\`,event.clientX,event.clientY)" onmouseleave="hideTip()"/>
+      <text class="bar-lab" x="${cx}" y="${(r.g>=0?top-8:top+hgt+15)}" text-anchor="middle">${sgn(r.g)}</text>
+      <text class="ch-lab" x="${cx}" y="${m.t+ih+22}" text-anchor="middle">${r.name.replace(" — ","—")}</text></g>`;
+  });
+  host.innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" role="img" aria-label="FX gain by channel">${ticks}<line class="baseline" x1="${m.l}" y1="${zeroY}" x2="${W-m.r}" y2="${zeroY}"/>${bars}</svg>`;
+}
+</script>
+</body>
+</html>
